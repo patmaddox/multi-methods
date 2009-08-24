@@ -23,7 +23,7 @@ module MultiMethods
     private
     def define_multi_method_using_dispatcher(name, dispatcher)
       define_method name do |*args|
-        dispatcher.execute(*args)
+        dispatcher.call(*args)
       end
     end
   end
@@ -46,7 +46,7 @@ module MultiMethods
       end
       include DSL
 
-      def execute(*args)
+      def call(*args)
         dispatching_value = @dispatching_method.call(*args)
         proc = code_for dispatching_value
         proc.call(*args)
