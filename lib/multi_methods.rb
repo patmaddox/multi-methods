@@ -5,19 +5,26 @@ module MultiMethods
   module ClassMethods
     def multi_method name, &block
       dispatcher = dispatcher_for name, &block
-      define_method name do |*args|
-        dispatcher.execute(*args)
-      end
+      define_multi_method_using_dispatcher name, dispatcher
     end
+
     def dispatchers
       @dispatchers ||= {}
     end
+
     def dispatcher_for name, &block
       unless dispatchers[name]
         dispatchers[name] = MultiMethod::Dispatcher.new
       end
       dispatchers[name].instance_eval &block
       dispatchers[name]
+    end
+
+    private
+    def define_multi_method_using_dispatcher(name, dispatcher)
+      define_method name do |*args|
+        dispatcher.execute(*args)
+      end
     end
   end
 
