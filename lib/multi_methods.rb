@@ -20,26 +20,31 @@ module MultiMethods
       dispatchers[name]
     end
   end
-  
-  
+
+
   class MultiMethod
     class Dispatcher
       def initialize
         @implementations = Hash.new(Proc.new {})
       end
-      def router &block
-        @dispatching_method = block
+
+      module DSL
+        def router &block
+          @dispatching_method = block
+        end
+
+        def implementation_for symbol, &block
+          @implementations[symbol] = block
+        end
       end
-      def implementation_for symbol, &block
-        @implementations[symbol] = block
-      end
+      include DSL
 
       def execute(*args)
         dispatching_value = @dispatching_method.call(*args)
         proc = code_for dispatching_value
         proc.call(*args)
       end
-      
+
 private
       def code_for dispatching_value
         @implementations[dispatching_value]
